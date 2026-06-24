@@ -9,6 +9,8 @@ declare global{
         interface Request{
             user: Session["user"],
             session: Session["session"],
+            organizationId: string,
+            memberRole: string,
         }
     }
 }

@@ -4,6 +4,7 @@ import "dotenv/config";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
 import { requireAuth } from "./middleware/requireAuth.js";
+import issueRoutes from "./routes/issues.js"
 
 const app = express();
 app.use(
@@ -16,6 +17,7 @@ app.use(
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json());
+app.use("/api/issues", issueRoutes);
 
 app.get('/health', (req, res) => {
     res.json({ status: "ok" });
