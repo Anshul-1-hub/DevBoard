@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { authClient } from "../lib/auth-client";
+import BoardPage from "./BoardPage.tsx";
 
 export default function DashboardPage(){
   const { data: session } = authClient.useSession();
@@ -11,19 +12,10 @@ export default function DashboardPage(){
   async function createWorkspace(){
     if (!workspaceName.trim()) return;
     setCreating(true);
-
     const slug = workspaceName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-    // learned this to create a username version (URL-friendly) of the workspace name.
-
-    const { error } = await authClient.organization.create({
-      name: workspaceName,
-      slug,
-    });
-
-    if(!error){
-      setWorkspaceName("");
-      setShowForm(false);
-    }
+    await authClient.organization.create({ name: workspaceName, slug });
+    setWorkspaceName("");
+    setShowForm(false);
     setCreating(false);
   }
 
@@ -36,30 +28,22 @@ export default function DashboardPage(){
       <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="font-bold text-gray-900 text-lg">DevBoard</span>
-          {activeOrg && (
-            <span className="text-gray-400">/</span>
-          )}
-          {activeOrg && (
-            <span className="text-gray-700 font-medium">{activeOrg.name}</span>
-          )}
+          {activeOrg && <span className="text-gray-400">/</span>}
+          {activeOrg && <span className="text-gray-700 font-medium">{activeOrg.name}</span>}
         </div>
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-500">{session?.user.name}</span>
-          <button
-            onClick={signOut}
-            className="text-sm text-gray-500 hover:text-gray-700"
-          >
+          <button onClick={signOut} className="text-sm text-gray-500 hover:text-gray-700">
             Sign out
           </button>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto mt-16 px-4">
+      <main>
         {!activeOrg ? (
-          <div className="text-center">
+          <div className="max-w-2xl mx-auto mt-16 px-4 text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Create your workspace</h2>
-            <p className="text-gray-500 mb-8">A workspace is where your team manages issues and projects.</p>
-
+            <p className="text-gray-500 mb-8">A workspace is where your team manages issues.</p>
             {!showForm ? (
               <button
                 onClick={() => setShowForm(true)}
@@ -69,9 +53,7 @@ export default function DashboardPage(){
               </button>
             ) : (
               <div className="bg-white border border-gray-200 rounded-xl p-6 text-left">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Workspace name
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Workspace name</label>
                 <input
                   type="text"
                   value={workspaceName}
@@ -100,12 +82,7 @@ export default function DashboardPage(){
             )}
           </div>
         ) : (
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Welcome to {activeOrg.name}
-            </h2>
-            <p className="text-gray-500">Issues board coming next session.</p>
-          </div>
+          <BoardPage orgId={activeOrg.id} />
         )}
       </main>
     </div>
