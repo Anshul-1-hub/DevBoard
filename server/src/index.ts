@@ -3,6 +3,7 @@ import cors from "cors";
 import "dotenv/config";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
+import { requireAuth } from "./middleware/requireAuth.js";
 
 const app = express();
 app.use(
@@ -18,6 +19,10 @@ app.use(express.json());
 
 app.get('/health', (req, res) => {
     res.json({ status: "ok" });
+})
+
+app.get("/api/me", requireAuth, (req, res) => {
+    res.json({user: req.user});
 })
 
 const PORT = process.env.PORT || 4000;
