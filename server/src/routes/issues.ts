@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import { requireOrg } from "../middleware/requireOrg.js";
+import { io } from "../index.js";
 
 const router = Router();
 
@@ -46,6 +47,7 @@ router.post("/", requireOrg, async (req, res) => {
     },
   });
 
+  io.to(`workspace:${req.organizationId}`).emit("issue:created", issue);
   res.status(201).json(issue);
 });
 
@@ -85,6 +87,7 @@ router.patch("/:id", requireOrg, async (req, res) => {
     },
   });
 
+  io.to(`workspace:${req.organizationId}`).emit("issue:updated", updated)
   res.json(updated);
 });
 
@@ -117,6 +120,7 @@ router.delete("/:id", requireOrg, async (req, res) => {
     },
   });
 
+  io.to(`workspace:${req.organizationId}`).emit("issue:deleted", { id });
   res.json({ success: true });
 });
 
