@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { authClient } from "../lib/auth-client";
 import BoardPage from "./BoardPage.tsx";
+import socket from "../lib/socket.ts";
+import MembersPage from "./MembersPage.tsx";
 
 export default function DashboardPage(){
   const { data: session } = authClient.useSession();
@@ -8,6 +10,19 @@ export default function DashboardPage(){
   const [workspaceName, setWorkspaceName] = useState("");
   const [creating, setCreating] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [activeTab, setActiveTab] = useState <"board" | "members">("board");
+
+  useEffect(() => {
+    if(!activeOrg) return;
+
+    socket.connect();
+    socket.emit("join-workspace", activeOrg.id);
+
+    return () => {
+      socket.emit("leave-workspace", activeOrg.id);
+      socket.disconnect();
+    }
+  }, [activeOrg?.id])
 
   async function createWorkspace(){
     if (!workspaceName.trim()) return;
@@ -67,13 +82,13 @@ export default function DashboardPage(){
                   <button
                     onClick={createWorkspace}
                     disabled={creating || !workspaceName.trim()}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {creating ? "Creating..." : "Create workspace"}
                   </button>
                   <button
                     onClick={() => setShowForm(false)}
-                    className="px-4 py-2 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
+                    className="px-4 py-2 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-100"
                   >
                     Cancel
                   </button>
@@ -82,7 +97,27 @@ export default function DashboardPage(){
             )}
           </div>
         ) : (
-          <BoardPage orgId={activeOrg.id} />
+          <div>
+            <div className="border-b border-gray-200 bg-white px-6">
+              <nav className="flex gap-6">
+                {(["board", "members"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`py-3 text-sm font-medium border-b-2 transition-colors capitalize ${
+                      activeTab === tab
+                        ? "border-blue-600 text-blue-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </nav>
+            </div>
+            {activeTab === "board" && <BoardPage orgId={activeOrg.id} />}
+            {activeTab === "members" && <MembersPage orgId={activeOrg.id} />}
+          </div>
         )}
       </main>
     </div>

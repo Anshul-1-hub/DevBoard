@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authClient } from "../lib/auth-client";
 import api from "../lib/api";
+import socket from "../lib/socket";
 import type { Issue, IssueStatus } from "../types";
+
 
 const COLUMNS: { status: IssueStatus; label: string }[] = [
   { status: "TODO", label: "Todo" },
@@ -31,6 +33,32 @@ export default function BoardPage({ orgId }: { orgId: string }){
     queryKey: ["issues", orgId],
     queryFn: () => api.get("/issues", { headers }).then((r) => r.data),
   });
+
+  useEffect(() => {
+    socket.on("issue:created", (issue: Issue) => {
+      queryClient.setQueryData<Issue[]>(["issues", orgId], (old) => 
+        old ? [issue, ...old] : [issue]    // if exists add the issue, or just a new one
+      );
+    })
+
+    socket.on("issue:updated", (issue: Issue) => {
+      queryClient.setQueryData<Issue[]>(["issues", orgId], (old) => 
+        old?.map((i) => (i.id === issue.id ? issue : i))
+      );
+    });
+
+    socket.on("issue:deleted", ({id} : {id: string}) => {
+      queryClient.setQueryData<Issue[]>(["issues", orgId], (old) => 
+        old?.filter((i) => i.id !== id)
+      );
+    });
+
+    return () => {
+      socket.off("issue:created");
+      socket.off("issue:updated");
+      socket.off("issue:deleted");
+    }
+  }, [orgId, queryClient]);
 
   const createMutation = useMutation({
     mutationFn: (data: { title: string; priority: string; description: string }) =>

@@ -6,8 +6,6 @@ import { fromNodeHeaders } from "better-auth/node";
 
 const router = Router();
 
-
-// GET all members of the workspace
 router.get("/", requireOrg, async (req, res) => {
   const members = await auth.api.listMembers({
     headers: fromNodeHeaders(req.headers),
@@ -16,7 +14,6 @@ router.get("/", requireOrg, async (req, res) => {
   res.json(members);
 });
 
-// POST add a member directly by email (no invite email needed)
 router.post("/", requireOrg, async (req, res) => {
   const { email, role = "member" } = req.body;
 
@@ -25,14 +22,13 @@ router.post("/", requireOrg, async (req, res) => {
     return;
   }
 
-  // find the user by email
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
     res.status(404).json({ error: "No user with that email exists. They need to sign up first." });
     return;
   }
 
-  try {
+  try{
     const member = await auth.api.addMember({
       body: {
         userId: user.id,
@@ -41,12 +37,13 @@ router.post("/", requireOrg, async (req, res) => {
       },
     });
     res.status(201).json(member);
-  } catch (err: any) {
+  } 
+  
+  catch (err: any) {
     res.status(400).json({ error: err.message ?? "Could not add member" });
   }
 });
 
-// DELETE remove a member (owner/admin only)
 router.delete("/:memberId", requireOrg, async (req, res) => {
   if (req.memberRole === "member") {
     res.status(403).json({ error: "Only owners and admins can remove members" });
