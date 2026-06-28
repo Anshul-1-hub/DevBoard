@@ -3,6 +3,7 @@ import { authClient } from "../lib/auth-client";
 import BoardPage from "./BoardPage.tsx";
 import socket from "../lib/socket.ts";
 import MembersPage from "./MembersPage.tsx";
+import ActivityPage from "./ActivityPage.tsx";
 
 export default function DashboardPage(){
   const { data: session } = authClient.useSession();
@@ -10,7 +11,7 @@ export default function DashboardPage(){
   const [workspaceName, setWorkspaceName] = useState("");
   const [creating, setCreating] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [activeTab, setActiveTab] = useState <"board" | "members">("board");
+  const [activeTab, setActiveTab] = useState <"board" | "members" | "activity">("board");
 
   useEffect(() => {
     if(!activeOrg) return;
@@ -100,7 +101,7 @@ export default function DashboardPage(){
           <div>
             <div className="border-b border-gray-200 bg-white px-6">
               <nav className="flex gap-6">
-                {(["board", "members"] as const).map((tab) => (
+                {(["board", "members", "activity"] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -117,6 +118,7 @@ export default function DashboardPage(){
             </div>
             {activeTab === "board" && <BoardPage orgId={activeOrg.id} />}
             {activeTab === "members" && <MembersPage orgId={activeOrg.id} />}
+            {activeTab === "activity" && <ActivityPage orgId={activeOrg.id} />}
           </div>
         )}
       </main>

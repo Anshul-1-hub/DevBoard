@@ -7,6 +7,7 @@ import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
 import { auth } from "./lib/auth.js";
 import issueRoutes from "./routes/issues.js";
 import memberRoutes from "./routes/members.js";
+import activityRoutes from "./routes/activity.js"
 
 const app = express();
 const httpServer = createServer(app);
@@ -30,6 +31,7 @@ app.all("/api/auth/*splat", toNodeHandler(auth));
 app.use(express.json());
 app.use("/api/issues", issueRoutes);
 app.use("/api/issues", memberRoutes);
+app.use("/api/activity", activityRoutes);
 
 app.get('/health', (req, res) => {
     res.json({ status: "ok" });
