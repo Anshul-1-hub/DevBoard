@@ -30,7 +30,7 @@ app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json());
 app.use("/api/issues", issueRoutes);
-app.use("/api/issues", memberRoutes);
+app.use("/api/members", memberRoutes);
 app.use("/api/activity", activityRoutes);
 
 app.get('/health', (req, res) => {

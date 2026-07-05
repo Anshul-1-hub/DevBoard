@@ -11,3 +11,9 @@ export const auth = betterAuth({
         organization(),
     ],
 });
+
+// Configures BetterAuth with:
+// - prismaAdapter: so BetterAuth stores users/sessions in our Postgres DB
+// - emailAndPassword: enables email/password auth
+// - trustedOrigins: allows frontend (localhost:5173 / Vercel) to make auth requests
+// - organization plugin: adds multi-tenancy (workspaces, members, roles)

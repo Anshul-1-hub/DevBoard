@@ -34,3 +34,13 @@ export async function requireOrg(req: Request, res: Response, next: NextFunction
   req.memberRole = member.role;
   next();
 }
+
+
+// Middleware that runs before every protected route.
+// Does 3 checks in order:
+// 1. Is the user logged in? (valid session)
+// 2. Did they send an x-organization-id header? (which org they're working in)
+// 3. Are they actually a member of that org? (not just claiming to be)
+// If all pass — attaches user, session, orgId, memberRole to req and calls next()
+// If any fail — returns 401/400/403 and stops the request
+// Needed because a user can belong to multiple orgs, server can't guess which one
