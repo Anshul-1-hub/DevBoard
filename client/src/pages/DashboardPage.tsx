@@ -125,3 +125,10 @@ export default function DashboardPage(){
     </div>
   );
 }
+
+// Main layout component after login. Does 3 things:
+// 1. Socket lifecycle — connects when workspace is active, joins the workspace room,
+//    cleans up (leave room + disconnect) when org changes or component unmounts
+// 2. Workspace creation — if no active org, shows create workspace form
+// 3. Tab navigation — switches between Board, Members, Activity pages
+//    passing orgId down to each as a prop

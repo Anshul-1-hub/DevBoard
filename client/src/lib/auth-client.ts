@@ -6,3 +6,7 @@ export const authClient = createAuthClient({
     plugins: [organizationClient()],
 });
 
+// Frontend auth client — gives us all auth functions and hooks for the UI
+// baseURL points to our Express server where BetterAuth is mounted
+// organizationClient plugin adds workspace/org functions like create, useActiveOrganization
+// Mirror of the backend auth.ts but for client side usage

@@ -7,11 +7,11 @@ const router = Router();
 
 router.get("/", requireOrg, async (req, res) => {
   const issues = await prisma.issue.findMany({
-    where: {
+    where:{
       organizationId: req.organizationId,
       deletedAt: null,
     },
-    orderBy: { createdAt: "desc" },
+    orderBy:{ createdAt: "desc"},
   });
   res.json(issues);
 });
@@ -19,13 +19,13 @@ router.get("/", requireOrg, async (req, res) => {
 router.post("/", requireOrg, async (req, res) => {
   const { title, description, priority, assigneeId } = req.body;
 
-  if (!title?.trim()) {
+  if(!title?.trim()){
     res.status(400).json({ error: "Title is required" });
     return;
   }
 
   const issue = await prisma.issue.create({
-    data: {
+    data:{
       title,
       description: description ?? null,
       priority: priority ?? "MEDIUM",
@@ -125,3 +125,15 @@ router.delete("/:id", requireOrg, async (req, res) => {
 });
 
 export default router;
+
+// Handles all Issue CRUD operations. Each route:
+// 1. Runs requireOrg middleware first (checks login + org membership)
+// 2. Does the DB operation via Prisma
+// 3. Writes an AuditLog row for every mutation
+// 4. Broadcasts the change to all workspace members via Socket.io
+// 5. Returns the result
+
+// GET / → fetch all non-deleted issues for the org
+// POST / → create issue, audit log it, broadcast issue:created
+// PATCH /:id → partial update (only update fields that were sent, not entire object)
+// DELETE /:id → soft delete (sets deletedAt, row stays in DB), broadcast issue:deleted

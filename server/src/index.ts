@@ -67,6 +67,14 @@ io.on("connection", (socket) => {
 });
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
     console.log(`The server is listening on port ${PORT}`);
 })
+
+// Main entry point of the server. Does 5 things:
+// 1. Creates HTTP server manually (so Express and Socket.io can share the same port)
+// 2. Sets up Socket.io on that server — io is exported so route files can broadcast events
+// 3. Mounts all REST routes (auth, issues, members, activity)
+// 4. Socket.io middleware — verifies session on every WebSocket connection (auth for sockets)
+// 5. Socket.io room logic — clients join/leave workspace rooms so broadcasts only go to the right people
+// Note: auth routes must be mounted BEFORE express.json() — BetterAuth parses its own body

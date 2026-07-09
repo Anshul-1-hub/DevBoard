@@ -41,3 +41,10 @@ function App(){
 }
 
 export default App;
+
+
+// Root component — handles routing and auth-based redirects
+// isPending check prevents flash of wrong page while session is being fetched
+// If logged in → can only access /dashboard (redirected away from login/signup)
+// If logged out → can only access /login and /signup (redirected away from dashboard)
+// "*" catch-all route handles any unknown paths
