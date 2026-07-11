@@ -9,7 +9,7 @@ type Member = {
   user: { id: string; name: string; email: string };
 }
 
-export default function MembersPage({ orgId }: { orgId: string }) {
+export default function MembersPage({ orgId }: { orgId: string | undefined}) {
   const queryClient = useQueryClient();
   const { data: session } = authClient.useSession();
   const { data: activeOrg } = authClient.useActiveOrganization();

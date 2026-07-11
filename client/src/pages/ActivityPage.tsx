@@ -37,7 +37,7 @@ function timeAgo(dateStr: string) {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-export default function ActivityPage({ orgId }: { orgId: string }) {
+export default function ActivityPage({ orgId }: { orgId: string | undefined}) {
   const headers = { "x-organization-id": orgId };
 
   const { data: logs = [], isLoading } = useQuery<AuditLog[]>({
