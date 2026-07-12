@@ -115,12 +115,12 @@ export default function BoardPage({ orgId }: { orgId: string | undefined}){
   return(
     <div className="bg-bg min-h-screen flex flex-col">
       <Navbar signOut={signOut}/>
-      <div className="p-6 flex-1">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-primary">Board</h2>
+      <div className="p-6 flex-1 px-30">
+        <div className="flex flex-col items-center justify-between mb-6">
+          <h2 className="text-2xl font-semibold text-primary self-center">Board</h2>
           <button
             onClick={() => setShowCreate(true)}
-            className="px-4 py-2 bg-primary text-bg rounded-lg text-sm font-bold hover:bg-primary-hover hover:cursor-pointer transition-colors"
+            className="px-4 py-2 bg-primary text-bg rounded-lg text-sm font-bold hover:bg-primary-hover hover:cursor-pointer transition-colors self-end"
           >
             + New Issue
           </button>
@@ -186,9 +186,9 @@ export default function BoardPage({ orgId }: { orgId: string | undefined}){
           {COLUMNS.map(({ status, label }) => {
             const columnIssues = issues.filter((i) => i.status === status);
             return(
-              <div key={status} className="bg-gray-100 rounded-xl p-4 min-h-100">
+              <div key={status} className="bg-surface rounded-xl p-4 min-h-100">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="font-medium text-gray-700 text-sm">{label}</span>
+                  <span className="font-medium text-primary text-sm">{label}</span>
                   <span className="bg-gray-200 text-gray-500 text-xs rounded-full px-2 py-0.5">
                     {columnIssues.length}
                   </span>
@@ -197,11 +197,11 @@ export default function BoardPage({ orgId }: { orgId: string | undefined}){
                   {columnIssues.map((issue) => (
                     <div
                       key={issue.id}
-                      className="bg-white rounded-lg p-3 shadow-sm border border-gray-200"
+                      className="bg-surface2 rounded-lg p-3 shadow-sm border border-border"
                     >
-                      <p className="text-sm font-medium text-gray-900 mb-2">{issue.title}</p>
+                      <p className="text-sm font-medium text-primary mb-2">{issue.title}</p>
                       {issue.description && (
-                        <p className="text-xs text-gray-500 mb-2 line-clamp-2">{issue.description}</p>
+                        <p className="text-xs text-secondary mb-2 line-clamp-2">{issue.description}</p>
                       )}
                       <div className="flex items-center justify-between">
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${PRIORITY_COLORS[issue.priority]}`}>
@@ -211,7 +211,7 @@ export default function BoardPage({ orgId }: { orgId: string | undefined}){
                           {status !== "TODO" && (
                             <button
                               onClick={() => moveIssue(issue, "back")}
-                              className="text-xs text-gray-400 hover:text-gray-600 px-1"
+                              className="text-xs text-gray-400 hover:text-gray-600 hover:cursor-pointer px-1"
                               title="Move back"
                             >
                               ←
@@ -220,7 +220,7 @@ export default function BoardPage({ orgId }: { orgId: string | undefined}){
                           {status !== "DONE" && (
                             <button
                               onClick={() => moveIssue(issue, "forward")}
-                              className="text-xs text-gray-400 hover:text-gray-600 px-1"
+                              className="text-xs text-gray-400 hover:text-gray-600 hover:cursor-pointer px-1"
                               title="Move forward"
                             >
                               →
@@ -229,7 +229,7 @@ export default function BoardPage({ orgId }: { orgId: string | undefined}){
                           {issue.creatorId === session?.user.id && (
                             <button
                               onClick={() => deleteMutation.mutate(issue.id)}
-                              className="text-xs text-red-400 hover:text-red-600 px-1"
+                              className="text-xs text-red-400 hover:text-red-600 hover:cursor-pointer px-1"
                               title="Delete"
                             >
                               ✕

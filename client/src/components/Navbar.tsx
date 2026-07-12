@@ -22,6 +22,7 @@ export function Navbar({signOut} : NavbarProps){
                     <Link to="/board">Board</Link>
                     <Link to="/activity">Activity</Link>
                     <Link to="/members">Members</Link>
+                    <Link to="/dashboard?switch=true">Switch Workspace</Link>
                 </div>
                 <div className="flex items-center gap-4 justify-end flex-1">
                     <span className="text-secondary">{session?.user.name}</span>

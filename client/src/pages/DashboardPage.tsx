@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { authClient } from "../lib/auth-client";
 import socket from "../lib/socket.ts";
 import { Navbar } from "../components/Navbar.tsx";
+import { useSearchParams } from "react-router-dom";
 
 export default function DashboardPage(){
   const { data:session } = authClient.useSession();
@@ -9,6 +10,10 @@ export default function DashboardPage(){
   const [workspaceName, setWorkspaceName] = useState("");
   const [creating, setCreating] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const forceSwitch = searchParams.get("switch") === "true";
+  const [showWorkspaces, setShowWorkspaces] = useState(false);
+  const {data: organizations} = authClient.useListOrganizations();
 
   useEffect(() => {
     if(!activeOrg) return;
@@ -42,7 +47,7 @@ export default function DashboardPage(){
     <Navbar signOut={signOut}/>
     <div className="flex-1 flex items-center justify-center pb-15">
       <main>
-        {!activeOrg ? (
+        {(!activeOrg || forceSwitch) ? (
           <div className="max-w-2xl w-full mx-auto px-4 text-center">
             <h2 className="text-2xl font-bold text-primary mb-2">Create your workspace.</h2>
             <p className="text-secondary mb-8">A workspace is where your team manages issues.</p>
@@ -60,7 +65,7 @@ export default function DashboardPage(){
                   type="text"
                   value={workspaceName}
                   onChange={(e) => setWorkspaceName(e.target.value)}
-                  placeholder="e.g. Acme Corp"
+                  placeholder="e.g. DevBoard"
                   className="w-full px-3 py-2 border border-primary rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary mb-4 placeholder-ph text-ph font-medium"
                   onKeyDown={(e) => e.key === "Enter" && createWorkspace()}
                   autoFocus
@@ -82,6 +87,18 @@ export default function DashboardPage(){
                 </div>
               </div>
             )}
+
+            <br />
+            <div className="text-primary font-bold pt-100">Your Workspaces</div>
+            <div className="flex flex-col gap-2 text-white font-medium py-4">
+              {organizations?.map((org) => (
+                <button key={org.id} onClick={async () => {
+                  authClient.organization.setActive({organizationId: org.id, organizationSlug: org.slug});
+                  setSearchParams({});
+                }} 
+                className="bg-surface border border-border rounded-lg py-3 hover:bg-surface-hover hover:cursor-pointer">{org.name}</button>
+              ))}
+            </div>
           </div>
         ) : (
           <div>
